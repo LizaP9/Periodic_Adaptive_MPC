@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" ?>
+<robot name="mini_cheetah">
+
+  <!--
+      Material colors
+    -->
+
+  <!-- Basic colors -->
+  <material name="black">
+    <color rgba="0.0 0.0 0.0 1.0"/>
+  </material>
+  <material name="blue">
+    <color rgba="0.0 0.0 0.8 1.0"/>
+  </material>
+  <material name="green">
+    <color rgba="0.0 0.8 0.0 1.0"/>
+  </material>
+  <material name="grey">
+    <color rgba="0.2 0.2 0.2 1.0"/>
+  </material>
+  <material name="light_grey">
+    <color rgba="0.4 0.4 0.4 1.0"/>
+  </material>
+  <material name="red">
+    <color rgba="0.8 0.0 0.0 1.0"/>
+  </material>
+  <material name="white">
+    <color rgba="1.0 1.0 1.0 1.0"/>
+  </material>
+
+  <!-- Dummy inertia link, because KDL cannot have inertia on the base link -->
+  <link name="root">
+    <pose> 0 0 0 0 0 0</pose>
+  </link>
+
+  <!-- Fixed joint to add dummy inertia link -->
+  <joint name="base_to_base_inertia" type="fixed">
+    <parent link="root"/>
+    <child link="link_body"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+  <!-- body link -->
+  <link name="link_body">
+    <pose> 0 0 0 0 0 0</pose>
+
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="3.3"/>
+      <inertia ixx="0.011253" ixy="0" ixz="0.0" iyy="0.036203" iyz="-0.0" izz="0.042673"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="../models/mini_cheetah/mini_body.obj"/>
+      </geometry>
+    </visual>
+
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="../models/mini_cheetah/mini_body.obj"/>
+      </geometry>
+    </collision>
+
+  </link>
+
+  <!-- ################### FRONT RIGHT LEG ################### -->
+
+  <!-- fr abad -->
+  <link name="link_fr_abad">
+    <pose> 0 0 0 0 0 0</pose>
+
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.57"/>
+      <inertia ixx="0.0007148275" ixy="0.0" ixz="0.0" iyy="0.0007955775" iyz="0.0" izz="0.00068875"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="../models/mini_cheetah/mini_abad.obj"/>
+      </geometry>
+    </visual>
+
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="../models/mini_cheetah/mini_abad.obj"/>
+      </geometry>
+    </collision>
+
+  </link>
+
+  <!-- JOINT FR ABAD TO BODY -->
+  <joint name="fr_abad_to_body" type="revolute">
+    <parent link="link_body"/>
+    <child link="link_fr_abad"/>
+    <axis xyz="0 1 0" />
+    <origin rpy="0 3.14159 -1.5708" xyz="0.139 -0.05 0"/>
+    <limit effort="1000.0" lower="-3.0" upper="3.0" velocity="1" />
+  </joint>
+
+  <!-- fr upper -->
+  <link name="link_fr_upper">
+    <pose> 0 0 0 0 0 0</pose>
+
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.634"/>
+      <inertia ixx="0.00261820866667" ixy="0.000245" ixz="0.000013" iyy="0.00265482216667" iyz="0.0000015" izz="0.000158764166667"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="../models/mini_cheetah/mini_upper_link.obj"/>
+      </geometry>
+    </visual>
+
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="../models/mini_cheetah/mini_upper_link.obj"/>
+      </geometry>
+    </collision>
+
+  </link>
+
+  <!-- JOINT FR UPPER TO ABAD -->
+  <joint name="fr_upper_to_abad" type="revolute">
+    <parent link="link_fr_abad"/>
+    <child link="link_fr_upper"/>
+    <!-- <axis xyz="0 1 0" /> -->
+    <axis xyz="0 -1 0" />
+    <origin rpy="3.14159 1.57079 1.5708" xyz="-0.0613 0.0575 0"/>
+    <limit effort="1000.0" lower="-3.0" upper="3.0" velocity="1" />
+  </joint>
+
+  <!-- fr lower -->
+  <link name="link_fr_lower">
+    <pose> 0 0 0 0 0 0</pose>
+
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.064"/>
+      <inertia ixx="0.000214698666667" ixy="0.0" ixz="0.0" iyy="0.000214698666667" iyz="0.0" izz="2.73066666667e-06"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="../models/mini_cheetah/mini_lower_link.obj"/>
+      </geometry>
+    </visual>
+
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="../models/mini_cheetah/mini_lower_link.obj"/>
+      </geometry>
+    </collision>
+
+  </link>
+
+  <!-- JOINT FR LOWER TO UPPER -->
+  <joint name="fr_lower_to_upper" type="revolute">
+    <parent link="link_fr_upper"/>
+    <child link="link_fr_lower"/>
+    <axis xyz="0 -1 0" />
+    <origin rpy="0 4.71238 0" xyz="-0.20835 -0.0011 0"/>
+    <limit effort="1000.0" lower="-3.0" upper="3.0" velocity="1" />
+  </joint>
+
+  <!-- ###################################-->
+
+
+  <!-- ################### FRONT LEFT LEG ################### -->
+
+  <!-- fl abad -->
+  <link name="link_fl_abad">
+    <pose> 0 0 0 0 0 0</pose>
+
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.57"/>
+      <inertia ixx="0.0007148275" ixy="0.0" ixz="0.0" iyy="0.0007955775" iyz="0.0" izz="0.00068875"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="../models/mini_cheetah/mini_abad.obj"/>
+      </geometry>
+    </visual>
+
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="../models/mini_cheetah/mini_abad.obj"/>
+      </geometry>
+    </collision>
+
+  </link>
+
+  <!-- JOINT FL ABAD TO BODY -->
+  <joint name="fl_abad_to_body" type="revolute">
+    <parent link="link_body"/>
+    <child link="link_fl_abad"/>
+    <axis xyz="0 1 0" />
+    <origin rpy="0 0 -1.5708" xyz="0.139 0.05 0"/>
+    <limit effort="1000.0" lower="-3.0" upper="3.0" velocity="1" />
+  </joint>
+
+  <!-- fl upper -->
+  <link name="link_fl_upper">
+    <pose> 0 0 0 0 0 0</pose>
+
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.634"/>
+      <inertia ixx="0.00261820866667" ixy="0.0" ixz="0.0" iyy="0.00265482216667" iyz="0.0" izz="0.000158764166667"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="../models/mini_cheetah/mini_upper_link.obj"/>
+      </geometry>
+    </visual>
+
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="../models/mini_cheetah/mini_upper_link.obj"/>
+      </geometry>
+    </collision>
+
+  </link>
+
+  <!-- JOINT FL UPPER TO ABAD -->
+  <joint name="fl_upper_to_abad" type="revolute">
+    <parent link="link_fl_abad"/>
+    <child link="link_fl_upper"/>
+    <!-- <axis xyz="0 -1 0" /> -->
+    <axis xyz="0 1 0" />
+    <origin rpy="3.14159 -1.57079 1.5708" xyz="-0.0613 0.0575 0"/>
+    <limit effort="1000.0" lower="-3.0" upper="3.0" velocity="1" />
+  </joint>
+
+  <!-- fl lower -->
+  <link name="link_fl_lower">
+    <pose> 0 0 0 0 0 0</pose>
+
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.064"/>
+      <inertia ixx="0.000214698666667" ixy="0.0" ixz="0.0" iyy="0.000214698666667" iyz="0.0" izz="2.73066666667e-06"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="../models/mini_cheetah/mini_lower_link.obj"/>
+      </geometry>
+    </visual>
+
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="../models/mini_cheetah/mini_lower_link.obj"/>
+      </geometry>
+    </collision>
+
+  </link>
+
+  <!-- JOINT FL LOWER TO UPPER -->
+  <joint name="fl_lower_to_upper" type="revolute">
+    <parent link="link_fl_upper"/>
+    <child link="link_fl_lower"/>
+    <axis xyz="0 1 0" />
+    <origin rpy="0 -1.57079 0" xyz="-0.20835 -0.0011 0"/>
+    <limit effort="1000.0" lower="-3.0" upper="3.0" velocity="1" />
+  </joint>
+
+  <!-- ###################################-->
+
+
+  <!-- ################### BACK RIGHT LEG ################### -->
+
+  <!-- br abad -->
+  <link name="link_br_abad">
+    <pose> 0 0 0 0 0 0</pose>
+
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.57"/>
+      <inertia ixx="0.0007148275" ixy="0.0" ixz="0.0" iyy="0.0007955775" iyz="0.0" izz="0.00068875"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="../models/mini_cheetah/mini_abad.obj"/>
+      </geometry>
+    </visual>
+
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="../models/mini_cheetah/mini_abad.obj"/>
+      </geometry>
+    </collision>
+
+  </link>
+
+  <!-- JOINT BR ABAD TO BODY -->
+  <joint name="br_abad_to_body" type="revolute">
+    <parent link="link_body"/>
+    <child link="link_br_abad"/>
+    <axis xyz="0 -1 0" />
+    <origin rpy="0 0 1.5708" xyz="-0.139 -0.05 0"/>
+    <limit effort="1000.0" lower="-3.0" upper="3.0" velocity="1" />
+  </joint>
+
+  <!-- br upper -->
+  <link name="link_br_upper">
+    <pose> 0 0 0 0 0 0</pose>
+
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.634"/>
+      <inertia ixx="0.00261820866667" ixy="0.0" ixz="0.0" iyy="0.00265482216667" iyz="0.0" izz="0.000158764166667"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="../models/mini_cheetah/mini_upper_link.obj"/>
+      </geometry>
+    </visual>
+
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="../models/mini_cheetah/mini_upper_link.obj"/>
+      </geometry>
+    </collision>
+
+  </link>
+
+  <!-- JOINT BR UPPER TO ABAD -->
+  <joint name="br_upper_to_abad" type="revolute">
+    <parent link="link_br_abad"/>
+    <child link="link_br_upper"/>
+    <axis xyz="0 -1 0" />
+    <origin rpy="3.14159 -1.57079 1.5708" xyz="-0.0613 0.0575 0"/>
+    <limit effort="1000.0" lower="-3.0" upper="3.0" velocity="1" />
+  </joint>
+
+  <!-- br lower -->
+  <link name="link_br_lower">
+    <pose> 0 0 0 0 0 0</pose>
+
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.064"/>
+      <inertia ixx="0.000214698666667" ixy="0.0" ixz="0.0" iyy="0.000214698666667" iyz="0.0" izz="2.73066666667e-06"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="../models/mini_cheetah/mini_lower_link.obj"/>
+      </geometry>
+    </visual>
+
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="../models/mini_cheetah/mini_lower_link.obj"/>
+      </geometry>
+    </collision>
+
+  </link>
+
+  <!-- JOINT BR LOWER TO UPPER -->
+  <joint name="br_lower_to_upper" type="revolute">
+    <parent link="link_br_upper"/>
+    <child link="link_br_lower"/>
+    <!-- <axis xyz="0 1 0" /> -->
+    <axis xyz="0 -1 0" />
+    <origin rpy="0 4.71238 0" xyz="-0.20835 -0.0011 0"/>
+    <limit effort="1000.0" lower="-3.0" upper="3.0" velocity="1" />
+  </joint>
+
+  <!-- ###################################-->
+
+
+  <!-- ################### BACK LEFT LEG ################### -->
+
+  <!-- bl abad -->
+  <link name="link_bl_abad">
+    <pose> 0 0 0 0 0 0</pose>
+
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.57"/>
+      <inertia ixx="0.0007148275" ixy="0.0" ixz="0.0" iyy="0.0007955775" iyz="0.0" izz="0.00068875"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="../models/mini_cheetah/mini_abad.obj"/>
+      </geometry>
+    </visual>
+
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="../models/mini_cheetah/mini_abad.obj"/>
+      </geometry>
+    </collision>
+
+  </link>
+
+  <!-- JOINT BL ABAD TO BODY -->
+  <joint name="bl_abad_to_body" type="revolute">
+    <parent link="link_body"/>
+    <child link="link_bl_abad"/>
+    <axis xyz="0 -1 0" />
+    <origin rpy="0 3.14159 1.5708" xyz="-0.139 0.05 0"/>
+    <limit effort="1000.0" lower="-3.0" upper="3.0" velocity="1" />
+  </joint>
+
+  <!-- bl upper -->
+  <link name="link_bl_upper">
+    <pose> 0 0 0 0 0 0</pose>
+
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.634"/>
+      <inertia ixx="0.00261820866667" ixy="0.0" ixz="0.0" iyy="0.00265482216667" iyz="0.0" izz="0.000158764166667"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="../models/mini_cheetah/mini_upper_link.obj"/>
+      </geometry>
+    </visual>
+
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="../models/mini_cheetah/mini_upper_link.obj"/>
+      </geometry>
+    </collision>
+
+  </link>
+
+  <!-- JOINT BL UPPER TO ABAD -->
+  <joint name="bl_upper_to_abad" type="revolute">
+    <parent link="link_bl_abad"/>
+    <child link="link_bl_upper"/>
+    <axis xyz="0 1 0" />
+    <origin rpy="3.14159 1.57079 1.5708" xyz="-0.0613 0.0575 0"/>
+    <limit effort="1000.0" lower="-3.0" upper="3.0" velocity="1" />
+  </joint>
+
+  <!-- bl lower -->
+  <link name="link_bl_lower">
+    <pose> 0 0 0 0 0 0</pose>
+
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.064"/>
+      <inertia ixx="0.000214698666667" ixy="0.0" ixz="0.0" iyy="0.000214698666667" iyz="0.0" izz="2.73066666667e-06"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="../models/mini_cheetah/mini_lower_link.obj"/>
+      </geometry>
+    </visual>
+
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="../models/mini_cheetah/mini_lower_link.obj"/>
+      </geometry>
+    </collision>
+
+  </link>
+
+  <!-- JOINT BL LOWER TO UPPER -->
+  <joint name="bl_lower_to_upper" type="revolute">
+    <parent link="link_bl_upper"/>
+    <child link="link_bl_lower"/>
+    <!-- <axis xyz="0 -1 0" /> -->
+    <axis xyz="0 1 0" />
+    <origin rpy="0 -1.57079 0" xyz="-0.20835 -0.0011 0"/>
+    <limit effort="1000.0" lower="-3.0" upper="3.0" velocity="1" />
+  </joint>
+
+  <!-- ###################################-->
+
+
+</robot>

@@ -1,0 +1,11 @@
+# Static joint limits parameters in degrees for a1
+joint0_min_limit: -60
+joint0_max_limit: 60
+
+joint1_min_limit: -38
+joint1_max_limit: 170
+
+joint2_min_limit: -156
+joint2_max_limit: -48
+
+safety_spread: 0.99

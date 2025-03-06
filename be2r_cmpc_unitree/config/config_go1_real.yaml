@@ -1,0 +1,17 @@
+# Static parameters fsm stand up for go1 real
+standup:
+  Kp_joint0: 80
+  Kp_joint1: 50
+  Kp_joint2: 50
+
+  Kd_joint0: 3
+  Kd_joint1: 3
+  Kd_joint2: 3
+
+  Kp_cartesian_x: 500
+  Kp_cartesian_y: 500
+  Kp_cartesian_z: 500
+
+  Kd_cartesian_x: 8
+  Kd_cartesian_y: 8
+  Kd_cartesian_z: 8

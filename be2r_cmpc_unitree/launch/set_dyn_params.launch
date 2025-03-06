@@ -1,0 +1,6 @@
+<launch>
+  <rosparam command = "load" file = "$(find be2r_cmpc_unitree)/config/ros_config.yaml"/>
+  <node name="dynamic_loader" pkg="dynamic_reconfigure" type="dynparam" args="set_from_parameters unitree_ctrl" output="screen">
+  </node>
+</launch>
+

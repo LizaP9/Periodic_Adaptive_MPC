@@ -1,0 +1,38 @@
+# Static parameters fsm stand up for a1 sim
+standup:
+  Kp_joint0: 80
+  Kp_joint1: 50
+  Kp_joint2: 50
+
+  Kd_joint0: 3
+  Kd_joint1: 3
+  Kd_joint2: 3
+
+  Kp_cartesian_x: 1000
+  Kp_cartesian_y: 1000
+  Kp_cartesian_z: 1200
+
+  Kd_cartesian_x: 35
+  Kd_cartesian_y: 35
+  Kd_cartesian_z: 55
+
+#-------------------------------
+static_params:
+  max_vel_x: 0.7
+  max_vel_y: 0.4
+  max_turn_rate: 2.5
+  r_circle: 0.09
+
+  alpha: 4.e-5
+  Q_roll: 0.25
+  Q_pitch: 0.25
+  Q_yaw: 10
+  Q_x: 2
+  Q_y: 2
+  Q_z: 10
+  Q_w_roll: 0.2
+  Q_w_pitch: 0.2
+  Q_w_yaw: 0.3
+  Q_vx: 1
+  Q_vy: 1
+  Q_vz: 15

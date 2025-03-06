@@ -1,0 +1,8 @@
+<launch>
+  <param name="use_sim_time" value="true"/>
+
+  <param name = "robot_description" command = "$(find xacro)/xacro --inorder '$(find raisim_unitree_ros_driver)/description/urdf/a1_edited.urdf' " />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+  <node pkg="tf" type="static_transform_publisher" name="world_to_odom" args="0 0 0 0 0 0 world odom 100" />
+
+</launch> 

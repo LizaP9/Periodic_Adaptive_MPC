@@ -1,0 +1,15 @@
+<launch>
+
+    <arg name="user_debug" default="false"/>
+    
+    <param name="robot_description" command="$(find xacro)/xacro '$(find a1_description)/xacro/robot.xacro'
+            DEBUG:=$(arg user_debug)"/>
+
+    <!-- for higher robot_state_publisher average rate-->
+    <!-- <param name="rate" value="1000"/> -->
+
+    <!-- send fake joint values -->
+    <node pkg="rviz" type="rviz" name="rviz" respawn="false" output="screen"
+        args="-d $(find a1_description)/launch/check_joint.rviz"/>
+
+</launch>

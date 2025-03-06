@@ -1,0 +1,18 @@
+<launch>
+    <arg name="air_fixed" default="false" doc="Hung up robot"/>
+    <arg name="urdf_path" default="$(find a1_description)/urdf/a1.urdf" doc="Where to put generated URDF file"/>
+    <arg name="is_vision" default="true"/>
+    <arg name="scene" default="2"/>
+
+    <!-- Start parsing xacro to urdf -->
+    <node pkg="xacro" type="xacro" name="generate_urdf" args="$(find a1_description)/xacro/robot.xacro -o $(arg urdf_path) DEBUG:=$(arg air_fixed)"/>
+    <param name="robot_description" textfile="$(arg urdf_path)"/>
+
+    <node pkg="raisim_unitree_ros_driver" type="raisim_unitree_ros_driver" name="raisim_unitree_ros_driver" respawn="false" output="screen"
+          launch-prefix="bash -c 'sleep 1.0; $0 $@' ">
+        <param name="air_fixed" type="bool" value="$(arg air_fixed)"/>
+        <param name="urdf_path" value="$(arg urdf_path)"/>
+        <param name="is_vision" value="$(arg is_vision)"/>
+        <param name="scene" value="$(arg scene)"/>
+    </node>
+</launch>
