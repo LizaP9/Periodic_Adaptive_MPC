@@ -1,0 +1,14 @@
+# Generated on Sat Feb  9 13:18:45 2019
+__collection-name__: robot-parameters
+
+controller_dt     : 0.002
+control_mode      : 0
+# Estimators
+foot_height_sensor_noise      :  0.001
+foot_process_noise_position   :  0.002
+foot_sensor_noise_position    :  0.001
+foot_sensor_noise_velocity    :  0.1
+imu_process_noise_position    :  0.02
+imu_process_noise_velocity    :  0.02
+
+

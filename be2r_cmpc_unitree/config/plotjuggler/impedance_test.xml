@@ -1,0 +1,146 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<root>
+ <tabbed_widget parent="main_window" name="Main Window">
+  <Tab tab_name="z" containers="1">
+   <Container>
+    <DockSplitter sizes="1" orientation="-" count="1">
+     <DockArea name="...">
+      <plot style="Lines" flip_x="false" mode="TimeSeries" flip_y="false">
+       <range top="0.430004" left="19.440200" right="29.440055" bottom="0.230004"/>
+       <limitY/>
+       <curve name="/body_info/pos_act/z" color="#1f77b4"/>
+      </plot>
+     </DockArea>
+    </DockSplitter>
+   </Container>
+  </Tab>
+  <Tab tab_name="dq" containers="1">
+   <Container>
+    <DockSplitter sizes="0.333656;0.332689;0.333656" orientation="-" count="3">
+     <DockArea name="...">
+      <plot style="Lines" flip_x="false" mode="TimeSeries" flip_y="false">
+       <range top="0.416698" left="19.440130" right="29.439965" bottom="-0.416805"/>
+       <limitY/>
+       <curve name="/all_legs_info/leg.0/joint.0/dq" color="#d62728"/>
+      </plot>
+     </DockArea>
+     <DockArea name="...">
+      <plot style="Lines" flip_x="false" mode="TimeSeries" flip_y="false">
+       <range top="0.352320" left="19.440130" right="29.439965" bottom="-0.351657"/>
+       <limitY/>
+       <curve name="/all_legs_info/leg.0/joint.1/dq" color="#1ac938"/>
+      </plot>
+     </DockArea>
+     <DockArea name="...">
+      <plot style="Lines" flip_x="false" mode="TimeSeries" flip_y="false">
+       <range top="0.702467" left="19.440130" right="29.439965" bottom="-0.703835"/>
+       <limitY/>
+       <curve name="/all_legs_info/leg.0/joint.2/dq" color="#ff7f0e"/>
+      </plot>
+     </DockArea>
+    </DockSplitter>
+   </Container>
+  </Tab>
+  <Tab tab_name="p_v" containers="1">
+   <Container>
+    <DockSplitter sizes="1" orientation="-" count="1">
+     <DockSplitter sizes="0.5;0.5" orientation="|" count="2">
+      <DockSplitter sizes="0.333656;0.332689;0.333656" orientation="-" count="3">
+       <DockArea name="...">
+        <plot style="Lines" flip_x="false" mode="TimeSeries" flip_y="false">
+         <range top="0.000184" left="19.440130" right="29.439965" bottom="-0.000004"/>
+         <limitY/>
+         <curve name="/all_legs_info/leg.0/p_act/x" color="#f14cc1"/>
+         <curve name="/all_legs_info/leg.0/p_des/x" color="#bcbd22"/>
+        </plot>
+       </DockArea>
+       <DockArea name="...">
+        <plot style="Lines" flip_x="false" mode="TimeSeries" flip_y="false">
+         <range top="-0.147458" left="19.440130" right="29.439965" bottom="-0.254233"/>
+         <limitY/>
+         <curve name="/all_legs_info/leg.0/p_act/y" color="#9467bd"/>
+         <curve name="/all_legs_info/leg.0/p_des/y" color="#1f77b4"/>
+        </plot>
+       </DockArea>
+       <DockArea name="...">
+        <plot style="Lines" flip_x="false" mode="TimeSeries" flip_y="false">
+         <range top="-0.148114" left="19.440130" right="29.439965" bottom="-0.201538"/>
+         <limitY/>
+         <curve name="/all_legs_info/leg.0/p_act/z" color="#17becf"/>
+         <curve name="/all_legs_info/leg.0/p_des/z" color="#d62728"/>
+        </plot>
+       </DockArea>
+      </DockSplitter>
+      <DockSplitter sizes="0.333656;0.332689;0.333656" orientation="-" count="3">
+       <DockArea name="...">
+        <plot style="Lines" flip_x="false" mode="TimeSeries" flip_y="false">
+         <range top="0.000469" left="19.440130" right="29.439965" bottom="-0.000368"/>
+         <limitY/>
+         <curve name="/all_legs_info/leg.0/v_act/x" color="#1ac938"/>
+         <curve name="/all_legs_info/leg.0/v_des/x" color="#9467bd"/>
+        </plot>
+       </DockArea>
+       <DockArea name="...">
+        <plot style="Lines" flip_x="false" mode="TimeSeries" flip_y="false">
+         <range top="0.078750" left="19.440130" right="29.439965" bottom="-0.078750"/>
+         <limitY/>
+         <curve name="/all_legs_info/leg.0/v_act/y" color="#ff7f0e"/>
+         <curve name="/all_legs_info/leg.0/v_des/y" color="#17becf"/>
+        </plot>
+       </DockArea>
+       <DockArea name="...">
+        <plot style="Lines" flip_x="false" mode="TimeSeries" flip_y="false">
+         <range top="0.080708" left="19.440130" right="29.439965" bottom="-0.080444"/>
+         <limitY/>
+         <curve name="/all_legs_info/leg.0/v_act/z" color="#f14cc1"/>
+         <curve name="/all_legs_info/leg.0/v_des/z" color="#bcbd22"/>
+        </plot>
+       </DockArea>
+      </DockSplitter>
+     </DockSplitter>
+    </DockSplitter>
+   </Container>
+  </Tab>
+  <currentTabIndex index="1"/>
+ </tabbed_widget>
+ <use_relative_time_offset enabled="1"/>
+ <!-- - - - - - - - - - - - - - - -->
+ <!-- - - - - - - - - - - - - - - -->
+ <Plugins>
+  <plugin ID="DataLoad CSV">
+   <default delimiter="0" time_axis=""/>
+  </plugin>
+  <plugin ID="DataLoad MCAP"/>
+  <plugin ID="DataLoad ROS bags">
+   <use_header_stamp value="true"/>
+   <discard_large_arrays value="false"/>
+   <max_array_size value="100"/>
+   <boolean_strings_to_number value="true"/>
+   <remove_suffix_from_strings value="false"/>
+  </plugin>
+  <plugin ID="DataLoad ULog"/>
+  <plugin ID="ROS Topic Subscriber">
+   <use_header_stamp value="false"/>
+   <discard_large_arrays value="true"/>
+   <max_array_size value="100"/>
+   <boolean_strings_to_number value="true"/>
+   <remove_suffix_from_strings value="true"/>
+  </plugin>
+  <plugin ID="UDP Server"/>
+  <plugin ID="WebSocket Server"/>
+  <plugin ID="ZMQ Subscriber"/>
+  <plugin ID="Fast Fourier Transform"/>
+  <plugin ID="Quaternion to RPY"/>
+  <plugin ID="Reactive Script Editor">
+   <library code="--[[ Helper function to create a ScatterXY series from arrays.&#xa;&#xa; series_name: name of the created ScatterXY series&#xa; prefix:      prefix of the timeseries, before the index of the array&#xa; suffix_X:   suffix to complete the name of the series containing the X value.&#xa;             if [nil], the index of the array will be used.&#xa; suffix_Y:   suffix to complete the name of the series containing the Y value&#xa; timestamp:   usually the tracker_time variable&#xa;              &#xa; Example:&#xa; &#xa; Assuming we have multiple series in the form:&#xa; &#xa;   /trajectory/node.{N}/position/x&#xa;   /trajectory/node.{N}/position/y&#xa;   &#xa; where {N} is the index of the array (integer). We can create a reactive series from the array with:&#xa; &#xa;   CreateSeriesFromArray( &quot;my_trajectory&quot;, &quot;/trajectory/node&quot;,  &quot;position/x&quot;, &quot;position/y&quot;, tracker_time );&#xa;]]--&#xa;&#xa;function CreateSeriesFromArray( series_name, prefix, suffix_X, suffix_Y, timestamp )&#xa;  --- create a new series or overwite the previous one&#xa;  new_series = MutableScatterXY.new(series_name)&#xa;  &#xa;  --- Append points to new_series&#xa;  index = 0&#xa;  while(true) do&#xa;&#xa;    x = index;&#xa;    -- if not nil, get the X coordinate from a series&#xa;    if suffix_X ~= nil then &#xa;      series_x = TimeseriesView.find( string.format( &quot;%s.%d/%s&quot;, prefix, index, suffix_X) )&#xa;      if series_x == nil then break end&#xa;      x = series_x:atTime(timestamp)&#x9; &#xa;    end&#xa;    &#xa;    series_y = TimeseriesView.find( string.format( &quot;%s.%d/%s&quot;, prefix, index, suffix_Y) )&#xa;    if series_x == nil then break end &#xa;    y = series_y:atTime(timestamp)&#xa;    &#xa;    new_series:push_back(x,y)&#xa;    index = index+1&#xa;  end&#xa;end&#xa;"/>
+   <scripts/>
+  </plugin>
+  <plugin ID="CSV Exporter"/>
+  <plugin ID="ROS /rosout Visualization"/>
+  <plugin ID="ROS Topic Re-Publisher"/>
+ </Plugins>
+ <!-- - - - - - - - - - - - - - - -->
+ <!-- - - - - - - - - - - - - - - -->
+ <!-- - - - - - - - - - - - - - - -->
+</root>
+

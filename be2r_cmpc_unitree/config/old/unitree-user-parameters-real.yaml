@@ -1,0 +1,44 @@
+__collection-name__: user-parameters
+
+# WBC
+use_wbc           : 1 # Switch wbc
+
+Kd_joint          : [1, 0.2, 0.2]
+Kp_joint          : [3, 3, 3]
+
+Kp_ori            : [100, 100, 100]
+Kd_ori            : [10, 10, 10]
+
+Kp_body           : [100, 100, 100]
+Kd_body           : [10, 10, 10]
+
+Kp_foot           : [500, 500, 500]
+Kd_foot           : [10, 10, 10]
+
+# Swing leg parameters
+# work when WBC turned off
+Swing_Kp_cartesian : [150, 150, 150]     # P gain impedance in swing
+Swing_Kd_cartesian : [3, 3, 3]    # D gain impedance in swing
+Swing_traj_height  : 0.09               # Set swing traj top point
+
+cmpc_gait         : 9 # convex MPC gait type
+cmpc_x_drag       : 3 # x comp param in solveDenseMPC
+cmpc_use_sparse   : 0 # switch between sparce and dense mpc
+cmpc_bonus_swing  : 0 # addition to pfx_rel variable in cmpc_locomotion
+
+# solver params
+jcqp_alpha        : 1.5
+jcqp_max_iter     : 10000
+jcqp_rho          : 1e-07
+jcqp_sigma        : 1e-08
+jcqp_terminate    : 0.1
+use_jcqp          : 0
+
+# For balance controller
+stance_legs       : 4
+
+# GaitScheduler params (from common/controllers)
+gait_type             : 4
+gait_period_time      : 0.5
+gait_switching_phase  : 0.5
+gait_override         : 4

@@ -1,0 +1,38 @@
+<launch>
+  <arg name="robot_type" default="a1"/>
+  <arg name="is_low_level" default="1"/>
+  <arg name="udp_connection" default="1"/>
+  <arg name="torque_safe_limit" default="0"/>
+  <arg name="power_limit" default="4"/>
+
+  <include file="$(find be2r_cmpc_unitree)/launch/set_dyn_params.launch" />
+
+  <group if="$(eval arg('robot_type') == 'a1')">
+    <param name = "robot_description" command = "$(find xacro)/xacro --inorder '$(find a1_description)/urdf/a1_edited.urdf' " />
+    <rosparam command = "load" file = "$(find be2r_cmpc_unitree)/config/joint_limits_a1.yaml"/>
+    <rosparam command = "load" file = "$(find be2r_cmpc_unitree)/config/config_a1_real.yaml"/>
+  </group>
+
+  <group if="$(eval arg('robot_type') == 'go1')">
+    <param name = "robot_description" command = "$(find xacro)/xacro --inorder '$(find go1_description)/urdf/go1.urdf' " />
+    <rosparam command = "load" file = "$(find be2r_cmpc_unitree)/config/joint_limits_go1.yaml"/>
+    <rosparam command = "load" file = "$(find be2r_cmpc_unitree)/config/config_go1_real.yaml"/>
+  </group>
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+  <!--     <arg name="rvizconfig" default="$(find unitree_ros_driver)/rviz/unitree.rviz" />
+      <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
+   -->
+
+  <node pkg="be2r_cmpc_unitree" type="unitree_ctrl" name="unitree_ctrl" output="screen">
+    <param name="map_topic" value="/elevation_mapping/elevation_map"/>
+    <param name="is_low_level" type="bool" value="$(arg is_low_level)" />
+    <param name="torque_safe_limit" type="bool" value="$(arg torque_safe_limit)" />
+    <param name="udp_connection" type="bool" value="$(arg udp_connection)" />
+    <param name="power_limit" type="int" value="$(arg power_limit)" />
+  </node>
+
+  <node name = "joy" pkg = "joy" type = "joy_node" output = "screen"/>
+
+</launch> 

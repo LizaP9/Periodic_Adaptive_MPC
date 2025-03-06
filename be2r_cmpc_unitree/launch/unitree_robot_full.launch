@@ -1,0 +1,16 @@
+<launch>
+
+  <arg name="is_low_level" default="1"/>
+
+  <rosparam command = "load" file = "$(find be2r_cmpc_unitree)/config/ros_config.yaml"/>
+
+  <param name = "robot_description" command = "$(find xacro)/xacro --inorder '$(find raisim_unitree_ros_driver)/description/urdf/a1_edited.urdf' " />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+  <include file="$(find unitree_ros_driver)/launch/lcm_server.launch" />
+
+  <node pkg="be2r_cmpc_unitree" type="unitree_ctrl" name="unitree_ctrl" output="screen">
+    <param name="is_low_level" type="bool" value="$(arg is_low_level)" />
+  </node>
+
+</launch> 

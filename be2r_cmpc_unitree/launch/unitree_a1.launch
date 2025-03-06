@@ -1,0 +1,82 @@
+<launch>
+<!--Parameters-->
+  <arg name="sim" default="true" />
+  <arg name="rqt_reconfigure" default="true" />
+  <arg name="robot_type" default="a1"/>
+  <arg name="rviz" default="false" />
+  <arg name="torque_safe_limit" default="0"/>
+
+  <!-- Choose robot type -->
+  <group if="$(eval arg('robot_type') == 'a1')">
+    <param name="robot_description" command="$(find xacro)/xacro $(find a1_description)/xacro/robot.xacro DEBUG:=false use_nominal_extrinsics:=true"/>
+    <rosparam command = "load" file = "$(find be2r_cmpc_unitree)/config/joint_limits_a1.yaml"/>
+    <group if="$(eval arg('sim') == true)">
+      <rosparam command = "load" file = "$(find be2r_cmpc_unitree)/config/config_a1_sim.yaml"/>
+    </group>
+    <group if="$(eval arg('sim') == false)">
+      <rosparam command = "load" file = "$(find be2r_cmpc_unitree)/config/config_a1_real.yaml"/>
+    </group>
+    
+  </group>
+
+  <group if="$(eval arg('robot_type') == 'go1')">
+    <param name = "robot_description" command = "$(find xacro)/xacro '$(find go1_description)/urdf/go1.urdf' " />
+    <rosparam command = "load" file = "$(find be2r_cmpc_unitree)/config/joint_limits_go1.yaml"/>
+    <group if="$(eval arg('sim') == true)">
+      <rosparam command = "load" file = "$(find be2r_cmpc_unitree)/config/config_go1_sim.yaml"/>
+    </group>
+    <group if="$(eval arg('sim') == false)">
+      <rosparam command = "load" file = "$(find be2r_cmpc_unitree)/config/config_go1_real.yaml"/>
+    </group>
+  </group>
+  
+
+  <!-- Update ros params from file -->
+  <include file="$(find be2r_cmpc_unitree)/launch/set_dyn_params.launch"/>
+
+
+  <group if="$(eval arg('sim') == true)">
+    <node pkg="be2r_cmpc_unitree" type="unitree_ctrl" name="unitree_ctrl" output="screen" launch-prefix="bash -c 'sleep 1.0; $0 $@' ">
+      <param name="map_plane_seg" value="/convex_plane_decomposition_ros/filtered_map"/>
+      <!-- <param name="map_topic_filter" value="/elevation_mapping/elevation_map"/> -->
+      <param name="map_topic_filter" value="/elevation_mapping/elevation_filter"/>
+      <param name="map_topic_raw" value="/elevation_mapping/elevation_map_raw"/>
+      <param name="udp_connection" type="bool" value="0" />
+      <param name="is_low_level" type="bool" value="0" />
+      <param name="torque_safe_limit" type="bool" value="0" />
+    </node>
+  </group>
+
+  <group if="$(eval arg('sim') == false)">
+    <node pkg="be2r_cmpc_unitree" type="unitree_ctrl" name="unitree_ctrl" output="screen" launch-prefix="bash -c 'sleep 1.0; $0 $@' ">
+      <param name="map_plane_seg" value="/convex_plane_decomposition_ros/filtered_map"/>
+      <param name="map_topic_filter" value="/elevation_mapping/elevation_map"/>
+      <param name="map_topic_raw" value="/elevation_mapping/elevation_map_raw"/>
+      <param name="torque_safe_limit" type="bool" value="0" />
+      <param name="udp_connection" type="bool" value="1" />
+      <param name="is_low_level" type="bool" value="1" />
+    </node>
+  </group>
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+        <param name="publish_frequency" type="double" value="1000.0"/>
+    </node>
+  <!-- <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    <param name="publish_default_positions" value="False" /> -->
+    <!-- <param name="source_list" value="joint_states" /> -->
+  <!-- </node> -->
+
+
+  <group if="$(eval arg('rqt_reconfigure') == true)">
+    <node name="be2r_rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure" launch-prefix="bash -c 'sleep 1.1; $0 $@' "/>
+  </group>
+
+  <group if="$(eval arg('rviz') == true)">
+    <arg name="rvizconfig" default="$(find elevation_mapping_demos)/rviz/visualMPC.rviz" />
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
+  </group>
+
+  <node name = "joy" pkg = "joy" type = "joy_node" output = "screen"/>
+
+  <node pkg="tf" type="static_transform_publisher" name="t265_odom_broadcaster" args="-0.0545 -0.076 0.205 -1.57 0 0 odom camera_t265_odom_frame 100" />
+
+</launch> 

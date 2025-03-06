@@ -1,0 +1,13 @@
+<launch>
+  <arg name="air_fixed" default="0"/>
+  <arg name="robot_type" default="a1"/>
+
+  <node pkg="raisim_unitree_ros_driver" type="raisim_unitree_ros_driver" name="raisim_unitree_ros_driver" respawn="false" output="screen">
+      <param name="air_fixed" type="bool" value="$(arg air_fixed)" />
+      <param name="robot_type" type="string" value="$(arg robot_type)" />
+  </node>
+
+  <!--     <arg name="rvizconfig" default="$(find unitree_ros_driver)/rviz/unitree.rviz" />
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
+ -->
+</launch>

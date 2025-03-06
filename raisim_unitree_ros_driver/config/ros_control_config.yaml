@@ -1,0 +1,14 @@
+mini_cheetah:
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 10
+
+  servo_0_joint_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: fr_abad_to_body
+    pid: { p: $(arg P), i: $(arg I), d: $(arg D) }
+
+  servo_1_joint_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: fr_upper_to_abad
+    pid: { p: $(arg P), i: $(arg I), d: $(arg D) }

@@ -1,0 +1,102 @@
+# Dynamic parameters
+# Must match with dynamic_reconfigure cfg file
+dynamic_loader:
+  FSM_State: 0
+  use_wbc: true
+  # use_wbc: false
+  # cmpc_gait: 9 # trot
+  cmpc_gait: 15 # trot long
+  # cmpc_gait: 4 # stand
+  test: 0
+
+  Kp_joint_0: 3.0
+  Kp_joint_1: 3.0
+  Kp_joint_2: 3.0
+
+  Kd_joint_0: 1.0
+  Kd_joint_1: 1.0
+  Kd_joint_2: 1.0
+
+  Kp_ori_0: 100.0
+  Kp_ori_1: 100.0
+  Kp_ori_2: 100.0
+
+  Kd_ori_0: 10.0
+  Kd_ori_1: 10.0
+  Kd_ori_2: 10.0
+
+  Kp_body_0: 100.0
+  Kp_body_1: 100.0
+  Kp_body_2: 100.0
+
+  Kd_body_0: 10.0
+  Kd_body_1: 10.0
+  Kd_body_2: 10.0
+
+  Kp_foot_0: 500.0
+  Kp_foot_1: 500.0
+  Kp_foot_2: 500.0
+
+  Kd_foot_0: 10.0
+  Kd_foot_1: 10.0
+  Kd_foot_2: 10.0
+
+  # Swing leg parameters
+  # work when WBC turned off
+  # Kp_cartesian_0: 150
+  # Kp_cartesian_1: 150
+  # Kp_cartesian_2: 150
+  # Kd_cartesian_0: 2.5
+  # Kd_cartesian_1: 2.5
+  # Kd_cartesian_2: 2.5
+
+# best for impedance test
+  Kp_cartesian_0: 900
+  Kp_cartesian_1: 900
+  Kp_cartesian_2: 900
+  Kd_cartesian_0: 15
+  Kd_cartesian_1: 15
+  Kd_cartesian_2: 15
+
+  body_height: 0.33
+  Swing_traj_height  : 0.17   # Set swing traj top point
+
+  # safety
+  # joint_limits: 1
+  joint_limits: 0
+
+  cmpc_x_drag       : 3       # x comp param in solveDenseMPC
+  cmpc_use_sparse   : 0       # switch between sparce and dense mpc
+  cmpc_bonus_swing  : 0       # addition to pfx_rel variable in cmpc_locomotion
+
+  # solver params
+  jcqp_alpha        : 1.5
+  jcqp_max_iter     : 10000
+  jcqp_rho          : 1e-07
+  jcqp_sigma        : 1e-08
+  jcqp_terminate    : 0.1
+  use_jcqp          : 0
+
+  # For balance controller
+  stance_legs       : 4
+
+  # GaitScheduler params (from common/controllers)
+  gait_type             : 4
+  gait_period           : 18
+  gait_period_time      : 0.5
+  gait_switching_phase  : 0.5
+  gait_override         : 4
+
+static_params:
+  controller_dt     : 0.002
+  cheater_mode      : false
+  horizon           : 16
+
+  # Estimators
+  foot_height_sensor_noise      :  0.001
+  foot_process_noise_position   :  0.002
+  foot_sensor_noise_position    :  0.001
+  foot_sensor_noise_velocity    :  0.1
+  imu_process_noise_position    :  0.02
+  imu_process_noise_velocity    :  0.02
+
