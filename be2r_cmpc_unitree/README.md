@@ -53,7 +53,7 @@ Launch the controller for the simulator with the universal launch file:
 ```
 roslaunch be2r_cmpc_unitree unitree_a1.launch sim:=true rviz:=false rqt_reconfigure:=true
 ```
-Аргументы:
+Arguments:
 - sim - (bool) whether running in simulation or on a real robot;
 - rviz - (bool) whether to start RViz;
 - rqt_reconfigure - (bool) whether to start rqt.
@@ -195,7 +195,7 @@ p_{step,i}=\left[p_{h,i}+R_z\left(\phi_k\right)l_i\right]+ \left[ \frac{T_{stanc
 
 \end{equation*}
 ```
-Here, the first bracket $[\dots]$ offsets the leg relative to the body center at that leg’s shoulder, the second bracketе $[\dots]$ is the **Raibert heuristic** with speed controlи ($k=0.3$), and the last bracket $[\dots]$ describes the concept of a **Capture point** (or (**ZMP**) Zero Moment Point).
+Here, the first bracket $[\dots]$ offsets the leg relative to the body center at that leg’s shoulder, the second bracket $[\dots]$ is the **Raibert heuristic** with speed control ($k=0.3$), and the last bracket $[\dots]$ describes the concept of a **Capture point** (or (**ZMP**) Zero Moment Point).
 # Leg Controller
 Implemented in the [LegController](/src/common/Controllers)  
 This class stores current and desired leg states, control commands, and computes the Jacobian matrix. The numbering of each leg’s joints starts from the shoulder. The numbering of legs and joints is:
@@ -236,9 +236,9 @@ You can launch the controller for either the simulator or the real robot. RaiSim
 
 Because the actuators have their own high-frequency PD loop, and the original control system also has a PD loop for the joints (see LegController, final torque formula), we added a flag is_low_level. When this flag is set, the PD gains for the joints are sent to the lower level, and the PD terms in the final formula are set to zero.
 
-Launch architecture with the simulator::
+Launch architecture with the simulator:
 ![image info](./images/launch_sim.png)  
-Архитектура запуска с реальным роботом:  
+Launch architecture with the real robot:  
 ![image info](./images/launch_real.png)  
 
 # Messages
@@ -258,7 +258,7 @@ The main parameters we typically adjust:
 All the robot’s dynamic and kinematic parameters are in [MiniCheetah.h](/src/common/Dynamics). These values are taken from the official URDF file of Unitree's GitHub repository.
 
 # Odometry (Position and Orientation estimators)
-The implementations are inе [PositionVelocityEstimator](/src/common/Controllers) and [OrientationEstimator](/src/common/Controllers)  
+The implementations are in [PositionVelocityEstimator](/src/common/Controllers) and [OrientationEstimator](/src/common/Controllers)  
 The orientation is taken directly from the IMU. OrientationEstimator computes the rotation matrix between the robot’s body and the world frame. The robot’s position is estimated using a Kalman filter. It estimates the position in the X,Y plane (in the world frame), but not Z. The robot’s height (Z) is estimated relative to the feet in contact, so with respect to a strict TF tree, you can say the odom frame is shifted in Z compared to the world frame. For example, if the dog goes upstairs, the odom frame moves up. Visualizing it requires the actual height of the robot body in the world frame.
 
 The estimation of “local height” was changed. Now the X,Y position estimation works as before, but the original Z estimator is replaced. The new algorithm determines the body height relative to the plane defined by the last 4 foot contact points.  
