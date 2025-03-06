@@ -29,7 +29,7 @@ catkin build
 
 # Raisim simulator
 
-Запуск визуализатора. На выбор (в opengl визуализация легче):
+Launch the visualizer. You can choose one of the following (opengl is easier for visualization):
 ```
 # unity
 roslaunch raisim unity.launch
@@ -37,53 +37,53 @@ roslaunch raisim unity.launch
 roslaunch raisim opengl.launch
 ```
 
-Запуск райсим сервера:
+Launch the Raisim server:
 ```
 roslaunch raisim_unitree_ros_driver spawn.launch scene:=2
 ```
-Аргументы: 
-- scene - указывает, какие объекты создать в сцене симулятора.
+Arguments:
+- scene - - indicates which objects will be created in the simulator scene.
 
-Запуск контроллера для симулятора отдельным launch файлом:
+Launch the controller for the simulator in a separate launch file:
 ```
 roslaunch be2r_cmpc_unitree unitree_sim.launch
 ```
 
-Запуск контроллера для симулятора универсальным launch файлом:
+Launch the controller for the simulator with the universal launch file:
 ```
-roslaunch be2r_cmpc_unitree unitree_a1.launch sim:=true rviz:=true rqt_reconfigure:=true
+roslaunch be2r_cmpc_unitree unitree_a1.launch sim:=true rviz:=false rqt_reconfigure:=true
 ```
 Аргументы:
-- sim - (bool) симулиция или запуск на роботе;
-- rviz - (bool) запускать ли rviz;
-- rqt_reconfigure - (bool) запускать ли rqt.
+- sim - (bool) whether running in simulation or on a real robot;
+- rviz - (bool) whether to start RViz;
+- rqt_reconfigure - (bool) whether to start rqt.
 
 
-Запуск rqt, управление состояниями и настройка параметров робота там (опционально)
+Launch rqt to control states and adjust robot parameters (optional):
 ```
 rqt
 ```
 
 # Real Unitree A1
-Запуск контроллера для управления (отдельным launch файлом):
+Launch the controller to control the real robot (separate launch file):
 ```
 roslaunch be2r_cmpc_unitree unitree_real.launch
 ```
 
-Запуск контроллера для симулятора универсальным launch файлом:
+Launch the controller for the simulator with the universal launch file:
 ```
 roslaunch be2r_cmpc_unitree unitree_a1.launch sim:=false rviz:=false rqt_reconfigure:=false
 ```
-Аргументы:
-- sim - (bool) симулиция или запуск на роботе;
-- rviz - (bool) запускать ли rviz;
-- rqt_reconfigure - (bool) запускать ли rqt.
+Arguments:
+- sim - (bool) whether running in simulation or on a real robot;
+- rviz - (bool) whether to start RViz;
+- rqt_reconfigure - (bool) whether to start rqt.
 
 
-# Конечный автомат состояний (FSM)
-Из походки вернуться в Passive можно двумя способами: 
-1. Из любого состояния напрямую. Приводы сразу переходят в режим демпфирования и робот плавно опускается на землю.
-2. Перейти сначала в Balance_Stand, потом Lay_Down и Passive.
+# Finite State Machine (FSM)
+You can exit from a gait state to the Passive state in two ways:
+1. From any state directly. The motors switch to damping mode, and the robot smoothly goes to the ground.
+2. Switch first to Balance_Stand, then Lay_Down, and finally Passive.
 ```mermaid
 graph TD;
   Passive-->Stand_Up;
@@ -99,18 +99,24 @@ graph TD;
   MPC_Locomotion-->Balance_Stand;
 ```
 
-# Описание работы системы управления
-В файле [be2r_cmpc_unitree_node](/src) находится главный цикл работы всей ноды. По умолчанию, он старается работать с частотой 500 Гц. То есть, если он успевает посчитать все, что вызывается в теле цикла меньше чем за 2 мс, то он будет работать четко с частотой 500 Гц. Если не будет успевать - будет работать с меньшей частотой.  
-Для перемещения роботу нужно перебирать ногами. Соответственно, движение ног можно разделить на две фазы: фазу полета (**swing**) и фазу контакта с землей (**stance**). В фазе контакта управление осуществляется двумя контроллерами: **MPC** (Model Predictive Control) и **WBC** (Whole Body Controller). В фазе полета управление осуществляется только WBC. Время, которое нужно определенной ноге находиться в определенной фазе, контролируется **Gait Scheduler**. Определенное сочетание периодов фаз складывается в шаблон походки.  
-Для удобного тестрования разных контроллеров, а также для разных шаблонов поведения в репозитории есть конечный автомат состояний **FSM** (Finite State Machine). У каждого состояния свой набор контроллеров и в них свой набор походок.  
-Управление роботом происходит с помощью подачи команд с желаемой линейной (X, Y) и угловой (Z) скоростей.  
-Архитектура системы управления:
+# Control System Description
+The file be2r_cmpc_unitree_node contains the main loop for the entire node. By default, it aims to run at 500 Hz. That is, if all computations in the loop body take less than 2 ms, it runs exactly at 500 Hz. Otherwise, the frequency is reduced.
+
+To move, the robot must cycle its legs. Thus, leg motion can be split into two phases: the flight phase (swing) and the ground contact phase (stance). During stance, the control is carried out by two controllers: MPC (Model Predictive Control) and WBC (Whole Body Controller). During the swing phase, only the WBC is active. The time each leg remains in a specific phase is managed by the Gait Scheduler. Specific combinations of stance and swing periods form a gait pattern.
+
+To facilitate testing different controllers as well as different behavior templates, there is a FSM (Finite State Machine). Each state uses its own set of controllers and corresponding gaits.
+
+Robot control is based on desired linear velocities (X, Y) and angular velocity (Z).
+
+Control system architecture:
 ![image info](./images/architecture.png) 
 
 # MPC
-Ближе всего к реализации в коде этот контроллер описан в статье convex_mpc. В файле MPC_to_QP подробно расписан переход от задачи MPC к задачи QP. Это нужно для того чтобы привести задачу к виду, который понимает солвер.  
-Оригинальная реализация контроллера находится в папке [convexMPC](/src/controllers/convexMPC). Так как мы меняли некоторые части контроллера, сделали копию этой папки и назвали CMPC.  
-Модель динамики робота сводится к модели твердого тела (кирпича/картошки), динамикой ног полностью пренебрегаем, тк их масса существенно ниже массы тела. Поэтому считаем, что движение ног в воздухе никак не влияет на тело. Состояние тела изменяется за счет сил с которыми ноги в контакте давят на поверхность земли.  Итоговую модель динамики упрощают, чтобы привести к линейному виду ниже.
+A controller implementation close to the one in code is described in the “convex_mpc” article. In the file MPC_to_QP, you can find the detailed derivation showing how the MPC problem is transformed into a QP problem, so that a solver can interpret it properly.
+
+The original implementation of the controller is located in [convexMPC](/src/controllers/convexMPC). Because we modified some parts, we created a copy named CMPC.
+
+The robot’s dynamics model is reduced to a rigid body (a “brick/potato”); the leg dynamics are neglected since their mass is significantly lower than the main body mass. Consequently, we assume leg movement in the air does not affect the body. The state of the body changes only due to the contact forces from the legs pressing on the ground. The final dynamics model is further simplified to the linear form shown below.
 ```math
 \begin{equation*}
     \frac{d}{dt}\begin{bmatrix}
@@ -138,13 +144,13 @@ graph TD;
     \end{bmatrix}
 \end{equation*}
 ```
-В коде есть разные реализации решения задачи оптимизации: **sparse** и **dense**, а также набор из 3 солверов. В исходном репозитории по умолчанию работал вариант **dense + qpOASES**, поэтому мы тоже используем его. Все остальные варианты несколько раз запускали, но тщательно не изучали, так как на глаз поведение робота ничем не отличалось.  
-**MPC** работает с частотой **~30 Гц**. Так как это меньше частоты работы главного цикла (**500 Гц**) и весь код выполняется последовательно, вызов контроллера MPC осуществляется один раз в заданное количество циклов контроллера (переменная **iterations_between_mpc**).  
-У данной реализации контроллера есть ряд отличий от описания в статье:  
-1. В статье сказано, что матрица системы Вход-Состояние-Выход выше строится на основе среднего угла **yaw** или $\psi$ по всему горизонту желаемой траектории тела. В коде просто берется текущий угол **yaw**. 
-2. В статье матрица входа системы на каждой итерации контроллера считается для каждого шага горизонта. Матрица состоит из радиус-векторов между ццентром тела и концами ног, то нужно изменять матрицу в зависимости от текущей походки на весь горизонт. В коде эта матрица считается только один раз на основе текущего состояния и дальше на горизонт не меняется ни ноги (силы), которые находятся в контакте, ни величина радиус-векторов.  
+There are various implementations for solving the optimization problem in the code: **sparse** and **dense**, along with three different solvers. In the original repository, the default option was **dense + qpOASES**, so we use that as well. We have tested all other options briefly, but did not study them thoroughly since the robot’s behavior visually appeared the same. 
+**MPC** runs at about **~30 Гц**. Since this is lower than the main loop frequency (500 Hz), and everything executes sequentially, the MPC controller is called once every set number of main loop iterations (the variable **iterations_between_mpc**).  
+Several aspects differ from the article’s description:
+1. In the paper, the system matrix (input-state-output) is built based on the average yaw angle **yaw** or $\psi$ over the entire horizon of the body’s desired trajectory. In the code, only the current **yaw** angle is used.
+2. In the paper, the system input matrix is computed at each controller iteration for each step of the horizon, depending on which feet are in contact and how the stance footprints change over time. However, in the code, this matrix is computed only once using the current state, and it does not change throughout the horizon (neither the set of feet in contact nor the leg position vectors). 
 
-**У контроллера есть побочный эффект** - при движении есть около линейная зависимость наклона корпуса от текущей скорости. Для ее компенсации введена простая эвристика, которая меняет желаемый угол наклона тела в зависимости от текущей скорости движения. 
+**Side effect of this controller** - during movement, there is an approximately linear dependence of the body tilt on the current speed. To compensate for this, a simple heuristic is introduced that adjusts the desired body pitch and roll angles depending on the current travel speed: 
 - Pitch:
 ```math
   \theta = k_{u,x} \cdot \dot{x}_{act} + k_{ox} + \alpha^*_x
@@ -155,29 +161,33 @@ graph TD;
   \phi = k_{u,y} \cdot \dot{y}_{act} + k_{oy} + \alpha^*_y
 
 ```
-где последнее слагаемое выражается следующим образом:
+where the last term is expressed as follows:
 ```math
 \begin{equation*}
     \alpha^*_{x,y}=-arccos\left(\frac{n_{x,y} }{\sqrt{n_x^2 + n_y^2 + n_z^2}}\right)+\frac{\pi}{2}
 \end{equation*}
 ```
-Эвристика содержит корркутировку плоскости контакта и два параметра: угол наклона зависимости $k_{u,x}$ и смещение $k_{ox}$. Коэффициенты определены серией экспериментов. Эвристика находится в методе run контроллера CMPC, присвоение переменной _pitch_cmd.  
-Наглядное представление модели и сил реакций:
+This heuristic accounts for contact-plane inclination and uses two parameters: the slope factor $k_{u,x}$ and offset $k_{ox}$.  These coefficients were determined experimentally. The heuristic is located in the run method of the CMPC controller and is assigned to the variable _pitch_cmd.
+A visual representation of the model and reaction forces:
 ![image info](./images/rigid_body_model.png)
-Но в нашей версии СК тела повернута вокруг оси Z на 90 градусов относительно той, что на рисунке. То есть, ось X смотрит вперед, ось Y - влево, Z так же вверх.
+Note that in our version, the robot body coordinate frame is rotated by 90 degrees around the Z-axis compared to the figure above. Hence, the X-axis points forward, the Y-axis points left, and Z remains upward.
 
 # WBC
-Реализация режит в папках [WBC](/src/controllers/WBC) и [WBC_Ctrl](/src/controllers/WBC_Ctrl).
-Мало что можем сказать про этот контроллер, так как не дошли до его глубокого изучения. Общие факты - работа на каждой итерации главного цикла (с частотой 500 Гц по умолчанию), берет на вход рассчитанные "черновые" силы из MPC, рассчитывает желаемые моменты в приводах на основе полной динамики робота с помощью оптимизации. В статьях есть две версии: **WBC** и **WBIC** (Whole Body Controller, Whole Body Impulse Controller). В коде, как мы понимаем, используется WBIC, так как реализация контроллера лежит в файлах WBIC. Фактически, WBC_Ctrl является интерфейсом контроллера WBIC и мы наблюдаем описанную выше передачу сил из МРС и вычисление полной модели.  
-WBIC работает на каждой итерации главного цикла, то есть с частотой 500 Гц.  
-Наглядное представление комбинации двух ноктроллеров:
+The implementation is located in [WBC](/src/controllers/WBC) and [WBC_Ctrl](/src/controllers/WBC_Ctrl).
+We do not have much detail on this controller yet since we did not study it in depth. In general, it runs at each iteration of the main loop (500 Hz by default), takes the “draft” ground reaction forces computed by the MPC, and calculates the desired joint torques using the full robot dynamics through an optimization procedure.
+
+Publications mention two versions: **WBC** and **WBIC** (Whole Body Controller, Whole Body Impulse Controller). In the code, it seems WBIC is used, since the controller’s source files are named WBIC. Essentially, WBC_Ctrl serves as a WBIC interface, and we see the force handoff from MPC to the full body model there.
+
+WBIC runs at each main loop iteration, i.e., at 500 Hz.
+
+A schematic representation of combining both controllers:
 ![image info](./images/wbc.png)
 
 # Leg swing trajectory generator
-Реализация находится в файле [FootSwingTrajectory](/src/common/Controllers)  
-Траектория фазы полета ног представляет собой составной сплайн Безье. Зависимость координат X и Y от времени - линейная, а Z строится по 3 точкам на основе двух кривых Безье. Первая и вторая точки - координата Z начала и конца траектории, третья - координата Z начальной точки + высота шага. Третья точка находится между первой и второй, и является вершиной траектории движения ноги. Траектория строится в мировой СК и в качестве базисной функции используется фаза переноса ног.
+The implementation is in [FootSwingTrajectory](/src/common/Controllers)  
+The flight phase trajectory of the legs is a composite Bezier spline. X and Y coordinates change linearly over time, while Z is built from three points using two Bezier curves. The first and second points are the start and end Z-coordinates of the trajectory, and the third is the start Z-coordinate plus the step height. The third point lies between the first two and is the apex of the foot trajectory. This trajectory is constructed in the world frame, and the phase of leg swing is used as the basis function.
 
-Вторая точка или точка, куда наступит нога, вычисляется по следующей эвристике:
+The second point, or the foot's landing point, is computed using the following heuristic:
 ```math
 \begin{equation*}
 
@@ -185,20 +195,21 @@ p_{step,i}=\left[p_{h,i}+R_z\left(\phi_k\right)l_i\right]+ \left[ \frac{T_{stanc
 
 \end{equation*}
 ```
-Где первые $[\dots]$ отвечают за смещение относительно центра тела к плечу конкретной ноги, вторые $[\dots]$ скобки являются **эвристикой Раиберта** с регулированием по скорости ($k=0.3$), а последние $[\dots]$ описывают концепт точки останова или **Capture point** (аналог (**ZMP**) Zero Moment Point или точки нулевого момента).
+Here, the first bracket $[\dots]$ offsets the leg relative to the body center at that leg’s shoulder, the second bracketе $[\dots]$ is the **Raibert heuristic** with speed controlи ($k=0.3$), and the last bracket $[\dots]$ describes the concept of a **Capture point** (or (**ZMP**) Zero Moment Point).
 # Leg Controller
-Реализация находится в файле [LegController](/src/common/Controllers)  
-Класс, в котором хранится текущее и желаемое состояние ног, команды управления, расчет матрицы Якоби. Нумерация приводов у каждой ноги начинается от плеча. Нумерация ног и приводов:  
-- 0 - передняя правая, приводы 0, 1, 2
-- 1 - передняя левая, приводы 3, 4, 5
-- 2 - задняя правая, приводы 6, 7, 8
-- 3 - задняя левая, приводы 9, 10, 11 
+Implemented in the [LegController](/src/common/Controllers)  
+This class stores current and desired leg states, control commands, and computes the Jacobian matrix. The numbering of each leg’s joints starts from the shoulder. The numbering of legs and joints is:
+
+- 0 – front right, joints 0, 1, 2
+- 1 – front left, joints 3, 4, 5
+- 2 – rear right, joints 6, 7, 8
+- 3 – rear left, joints 9, 10, 11
 
 
 
 # Body Manager
-Реализация находится в файле [be2r_cmpc_unitree](/src/be2r_cmpc_unitree)  
-Самый высокоуровневый класс, в котором создаются все экземпляры других классов, передаются друг другу в конструкторы и вызывается основной метод run у FSM. В этом классе реализован ROS интерфейс взаимодействия с симулятором, вызываются основные колбэки. В этом классе рассчитывается итоговый момент, отправляемый роботу. Момент для управления приводом рассчитывается по следующей формуле:  
+Implemented in [be2r_cmpc_unitree](/src/be2r_cmpc_unitree)  
+This is the top-level class where all other class instances are created, passed into each other’s constructors, and where the main run method of the FSM is called. It provides the primary ROS interface for interacting with the simulator and handles key callbacks. It also calculates the final torque sent to the robot. The torque is computed as follows:
 
 
 ```math
@@ -218,64 +229,70 @@ F_{foot} = K_{p_{cart}}(p_{des}-p_{act}) + K_{d_{cart}}(\dot{p}_{des}-\dot{p}_{a
 - $q,p$ -- The joint angle  and position of the leg's feet.
 
 
-Так как исходный репозиторий написан для другого робота, соглашение о положительном вращении звеньев отличается от Unitree A1. Отличаются **знаками второй и третий привод каждой ноги**. Нужно менять знак на противоположный у положения и скорости приводов при чтении с робота, и менять знаки моментов перед отправкой на роботоа.   
+Because the original repository was written for a different robot, the sign convention for the second and third joints of each leg differs from the Unitree A1. We must invert the sign for their positions and velocities when reading from the robot, and similarly invert the sign of torque when sending commands to the robot.
 
-# Архитектура запуска
-Запускать контроллер можно для работы с симулятором и для работы с реальным роботом. В качестве симулятора используется RaiSim. Для работы с собакой в симуляторе нужно запустить лаунч файл [raisim_unitree_ros_driver.launch](/launch). Обмен данными контроллера и симулятора происходит через ROS топики. Связь с роботом происходит через UDP. В связи с этим, в коде установлен флаг, который меняет направление приема передачи данных в зависимости от типа запуска: is_udp. Если флаг поднят, то обмен данными будет происходить через SDK [unitree_legged_sdk](https://gitlab.com/rl-unitree-a1/unitree_legged_sdk). SDK есть разных версий для разных моделей роботов. Мы форкнули себе определенную версию, с которой наш робот работал. В SDK кроме возможности обмена данными есть встроенный контур безопасности. Выглядит он как отдельная функция, которая принимает на вход текущее состояние робота и число, соответствующее максимальной допустимой мощности в десятках % (то есть если передано число 4 - ограничение 40% мощности). При превышении значения допустимой мощности, контроллер выключится и напишет об ошибке в терминале.  
-Так как у приводов есть свой высокочастотный контур управления с ПД регулятором, а в исходной системе управления есть контур ПД управления приводами (см пункт LegController, итоговую формулу расчета момента), был добавлен флаг is_low_level, при поднятии которого, коэффициенты ПД регулятора приводов отправляются на нижний уровень, а в итоговой длинной формуле момента зануляются.  
-Архитектура запуска с симулятором:
+# Launch Architecture
+You can launch the controller for either the simulator or the real robot. RaiSim is used as the simulator. To work with the dog in the simulator, you should launch the [raisim_unitree_ros_driver.launch](/launch). The exchange of data between the controller and the simulator happens via ROS topics. Communication with the real robot happens via UDP. Therefore, the code has a flag is_udp. When it’s set, data exchange is done with [unitree_legged_sdk](https://gitlab.com/rl-unitree-a1/unitree_legged_sdk). The SDK exists in different versions for different models of robots. We forked a certain version that worked with our robot. The SDK also has a built-in safety function that checks the current state and a maximum allowed power limit in increments of 10% (if you send 4, for example, that’s a 40% power limit). If the actual power exceeds that limit, the controller shuts down and prints an error message to the terminal.
+
+Because the actuators have their own high-frequency PD loop, and the original control system also has a PD loop for the joints (see LegController, final torque formula), we added a flag is_low_level. When this flag is set, the PD gains for the joints are sent to the lower level, and the PD terms in the final formula are set to zero.
+
+Launch architecture with the simulator::
 ![image info](./images/launch_sim.png)  
 Архитектура запуска с реальным роботом:  
 ![image info](./images/launch_real.png)  
 
-# Сообщения
-У Unitree в репозитории есть свой пакет с сообщениями [unitree_legged_msgs](https://gitlab.com/rl-unitree-a1/unitree_legged_msgs), в котором лежат ROS сообщения аналогичные структурам данных, которые используются для обмена данными с реальным роботом. Мы скопировали этот репозиторий себе, не меняли исходные сообщения, но стали добавлять туда свои кастомные. Для обмена данными с роботом используется две структуры: LowCmd и LowState. В LowCmd лежат желаемые низкоуровневые команды роботу, в LowState лежит низкоуровневое состояние робота: положение и скорости всех приводов, IMU.  
+# Messages
+In Unitree’s repository, there is a package [unitree_legged_msgs](https://gitlab.com/rl-unitree-a1/unitree_legged_msgs),  that contains ROS messages analogous to the data structures used to communicate with the real robot. We copied the repository without changing the original messages, but we added our own custom ones. Two structures are used for data exchange with the robot: LowCmd and LowState. LowCmd contains the desired low-level commands, while LowState contains the current low-level robot state (positions and velocities of all joints, IMU data, etc.).  
 
-# Конфигурация
-Конфигурация работы ноды состоит из статических и динамических ROS параметров. Все конфиг файлы лежат в папке [config](/config). Основные статические параметры находятся в файле ros_config под префиксом static_params. Так как мы частично тестировали решение еще и на Unitree Go1, то создали дополнительные конфиг файлы для конкретной модели робота. Они называются config_a1_real(sim) и config_go1_real(sim). Для каждого робота есть две версии конфиг файлов: для работы в симуляторе (..._sim) и на реальном роботе (..._real), так как для лучшей работы решения в обоих вариантах запуска параметры настраиваются отдельно. Дополнительно вынесли статические параметры с ограничениями приводов для каждого робота в joint_limits_a1 и joint_limits_a1. Пэтому в launch-файлах есть аргумент robot_type, который используется для указания модели робота [a1, go1].  
-Динамические параметры задаются в файле [ros_dynamic_params.cfg](/config). У них можно задавать начальные значения, но они требуют пересборки при изменении. Поэтому все динамические параметры из этого файла продублированы в ros_config с префиксом dynamic_loader. При запуске лаунч файла контроллера запускается нода, которая считывает эти начальные динамические параметры и загружает их в dynamic_reconfigure. Благодаря такому небольшому костылю можно менять абсолютно все параметры без пересборки.  
-Основные параметры, которые мы меняем при работе:  
-- gait_period - период всех походок в итерациях MPC
-- joint_limits - включение лимитов на положение звеньев. При выходе любого привода за разрешенные границы, контроллер экстренно выключается и все приводы переводятся в режим демпфирования
-- body_height - высота тела робота, которую нужно удерживать во время ходьбы. Высота задается относительно ног
-- Swing_traj_height - высота, на которую нужно поднимать ноги в фазе полета
-- cmpc_gait - номер походки по умолчанию
+# Configuration
+Node configuration consists of static and dynamic ROS parameters, all in the [config](/config). The main static parameters are in ros_config under the static_params prefix. Since we partially tested the code on Unitree Go1, we created additional config files for each robot model: config_a1_real(sim) and config_go1_real(sim). For each robot, there is a simulator configuration (..._sim) and a real-robot configuration (..._real). These differ because we fine-tune parameters for improved performance in both scenarios. We also separate out joint limits for each robot into joint_limits_a1 or joint_limits_go1. Therefore, in the launch files, there is a robot_type argument specifying the model: [a1, go1].  
+Dynamic parameters are defined in [ros_dynamic_params.cfg](/config). You can set initial values there, but changes to that file require recompilation. Therefore, all dynamic parameters from this file are duplicated in ros_config under the dynamic_loader prefix. When the controller’s launch file starts, a node reads these initial dynamic parameters and loads them into dynamic_reconfigure. With this small workaround, we can change all parameters without recompiling. 
+The main parameters we typically adjust:
+- gait_period - the period of all gaits in MPC iterations
+- joint_limits - turning on joint position limits. If any joint exceeds its allowed range, the controller immediately turns off and switches motors to damping
+- body_height - the robot’s body height to maintain during walking. The height is defined relative to the legs
+- swing_traj_height - the height to which the legs should be lifted during swing phase
+- cmpc_gait - the default gait ID
 
-# Параметризация
-Все динамические и кинематические параметры робота хранятся в файле [MiniCheetah.h](/src/common/Dynamics). Все параметры взяты из официального URDF файла репозитория Unitree на github.
+# Parameterization
+All the robot’s dynamic and kinematic parameters are in [MiniCheetah.h](/src/common/Dynamics). These values are taken from the official URDF file of Unitree's GitHub repository.
 
 # Odometry (Position and Orientation estimators)
-Реализация находится в файле [PositionVelocityEstimator](/src/common/Controllers) и [OrientationEstimator](/src/common/Controllers)  
-Оценка ориентации тела берется напрямую из IMU. OrientatonEstimator рассчитывает матрицу поворота между телом и мировой СК. Для оценки положения используется фильтр Калмана. Он оценивает положения робота в мировой СК, кроме координаты Z. Высота робота оценивается относительно ног в контакте, поэтому, с точки зрения "истинного" дерева TF можно сказать, что odom frame смещается по оси Z относительно world frame. Например, если собака поднимается по лестнице, то odom frame будет смещаться вверх. Но визуализировать это можно только зная высоту тела робота относительно мировой СК.  
-Оценка "локальной высоты" робота была изменена. Теперь оценка положения по X,Y работает как раньше, а оценка Z оригинального алгоритма заменяется на другой. Новый алгоритм определяет высоту тела относительно плоскости, проведенной через 4 последние точки контакта ног.  
+The implementations are inе [PositionVelocityEstimator](/src/common/Controllers) and [OrientationEstimator](/src/common/Controllers)  
+The orientation is taken directly from the IMU. OrientationEstimator computes the rotation matrix between the robot’s body and the world frame. The robot’s position is estimated using a Kalman filter. It estimates the position in the X,Y plane (in the world frame), but not Z. The robot’s height (Z) is estimated relative to the feet in contact, so with respect to a strict TF tree, you can say the odom frame is shifted in Z compared to the world frame. For example, if the dog goes upstairs, the odom frame moves up. Visualizing it requires the actual height of the robot body in the world frame.
+
+The estimation of “local height” was changed. Now the X,Y position estimation works as before, but the original Z estimator is replaced. The new algorithm determines the body height relative to the plane defined by the last 4 foot contact points.  
 
 # Debug
-Реализация находится в папке [debug](/src/common/debug).  
-Для удобной отладки работы контроллеров мы сделали класс Debug. В него мы помещаем всю текущую информацию о состоянии работы системы и выводим в отдельные топики для построения графиков в PlotJuggler и визуализации в RViz.
+Implemented in the [debug](/src/common/debug).  
+We created a Debug class for easy debugging of the controllers. It collects all current system state information and publishes it to separate topics for plotting in PlotJuggler or visualizing in RViz.
 
 # Finite State Machine (FSM)
-Реализация находится в папке [fsm](/src/fsm). Там же находится описание всех состояний. У каждого состояния своя папка.  
-Конечный автомат состояний, сделан для того, чтобы можно было программировать разные поведения робота для разных сценариев использования.   
-Коротко про основные состояния:  
-- Passive - состояние, в котором робот не делает ничего, у моторов отключена возможность исполнения команд. 
-- StandUp - состояние, в котором робот встает из лежачего состояния для дальнейшей походки. В этом состоянии работает только импедансный контроллер на каждой из лап. Запоминается положение всех лап в СК плеч и затем линейной интерполяцией изменяется желаемая координата Z на 25 см. Такая реализация была изначально, работает не очень хорошо, так как ноги, по сути, ведут себя как пружинки. Была добавлена компенсация гравитации, но сильно работу это не улучшило.
-- BalanceStand - состояние, в котором робот стоит на 4 ногах, есть возможность менять ориентацию и высоту тела.
-- Locomotion_baseline - оригинальное состояние походки. Мы специально оставили оригинальную походку без изменений, чтобы можно было сравнивать нашу версию с исходной. Добавили лишь вывод данных в debug.
-- Locomotion - тестовое состояние, в котором ведется разработка слепой походки. Во всех демках использовали это состояние.
-- LocomotionCV - состояние с походками в зрячем режиме.
-- LayDown - состояние аналогичное StandUp, но с обратным движением ног, чтобы лечь. Не рекомендуется использовать это состояние. Лучше сразу перейти в состояние Passive.  
+Implemented in the [fsm](/src/fsm). That folder also contains the definitions of all states. Each state has its own folder.
+The FSM is used to implement different robot behaviors for various use cases.
+
+A brief overview of the main states:
+
+- Passive: The robot does nothing; the motors are disabled.
+- StandUp: The robot stands up from a lying position in preparation for walking. In this state, an impedance controller is used for each leg. The positions of all legs in shoulder coordinates are recorded, then the desired Z is changed by 25 cm via linear interpolation. This is the original approach— it doesn’t work great, since the legs behave somewhat like springs. We added gravity compensation, but it did not drastically improve performance.
+- BalanceStand: The robot stands on four legs, with the ability to change orientation and body height.
+- Locomotion_baseline: The original built-in walking gait. We kept it unchanged to compare our new version with the original. We only added debug outputs.
+- Locomotion: A test state used for developing blind walking. We used this state in all demos.
+- LocomotionCV: A state with visually-guided gaits.
+- LayDown: The opposite of StandUp, where the robot lowers itself to the ground. Not recommended; it’s usually better to switch directly to Passive.
 
 # Gait scheduler
-Есть две реализации: [GaitScheduler](/src/common/Controllers) и [Gait](/src/controllers/convexMPC) (либо его копия в [Gait_Contact](/src/controllers/CMPC)) [deprecated]. Используется в коде только версия Gait.  
-Походка представляет собой шаблон периодов нахождения ног в фазе полета (swing) и контакта (stance). Любую походку можно задать через два параметра для каждой ноги: доля полного периода походки для фазы контакта (длительность нахождения ноги в контакте) и смещение начала фазы контакта во времени. Длительность периода походки задается через количество итераций MPC контроллера. Например, при 13 итерациях между вызовом MPC (iterations_between_mpc = 13) и периоде походке 18 (gait_period = 18) длительность фазы контакта будет составлять 0.002 * 13 * 18 / 2 = 0.234 с.
-Шаблоны походки задаются в списке инициализации конструктора контроллеров, например в конструкторе класса [convexMPCLocomotion](/src/controllers/convexMPC). У каждой походки есть свой номер, например 4 - стоять на месте, 9 - трот (ноги попарно в противофазе, стандартаная походка). Номер у каждой походки задается прямо в цикле run MPC контроллера.  
-Наглядный пример паттернов походки животных (https://www.youtube.com/watch?v=PVvZKcKBTtg):  
+There are two implementations: [GaitScheduler](/src/common/Controllers) and [Gait](/src/controllers/convexMPC) (or its copy [Gait_Contact](/src/controllers/CMPC)) [deprecated]. The code only uses Gait.  
+A gait is a pattern of stance and swing durations for each leg. Any gait can be specified via two parameters per leg: the fraction of the gait period allocated to stance, and the phase offset for the start of stance. The total gait period is specified by the number of MPC iterations. For example, with iterations_between_mpc = 13 and gait_period = 18, and a stance phase that’s half the gait cycle, the stance duration for a leg will be 0.002 * 13 * 18 / 2 = 0.234 с.
+Gaits are defined in a list in the constructor of the controllers, for example in the constructor of convexMPCLocomotion in [convexMPCLocomotion](/src/controllers/convexMPC). Each gait has its own ID (e.g., 4 for standing, 9 for trot). The ID is assigned in the main MPC run loop.
+
+Below is a visual example of typical animal gait patterns (https://www.youtube.com/watch?v=PVvZKcKBTtg):  
 ![image info](./images/nature_gaits.png)  
-Наглядное представление фазы походки одной ноги:  
+A schematic representation of a single leg’s gait cycle:  
 ![image info](./images/gait_cycle.png)
 
 # CV walking
-Для запуска с импользованием зрения и карты проходимости необходимо использовать репозиторий: [elevation_map](https://gitlab.com/rl-unitree-a1/elevation_map)
+To run with vision and an elevation map, you need the repository: [elevation_map](https://gitlab.com/rl-unitree-a1/elevation_map)
 
 # Article
 Artem A.Egorov, Maxim V. Lyahovski, Denis A. Sokolov, Alexey M.Burkov, Sergey A. Kolyubin. Design and performance evaluation of receding horizon controllers for quadrupedal robots: case study on stairs climbing and balancing.[HERE](doc/IFAC_WC_quadro__3_.pdf)
