@@ -60,7 +60,6 @@ Arguments:
 - rviz - (bool) whether to start RViz;
 - rqt_reconfigure - (bool) whether to start rqt.
 
-
 Launch rqt to control states and adjust robot parameters (optional):
 ```
 rqt
@@ -80,14 +79,6 @@ Arguments:
 - sim - (bool) whether running in simulation or on a real robot;
 - rviz - (bool) whether to start RViz;
 - rqt_reconfigure - (bool) whether to start rqt.
-- 
-# External Disturbance
-To add or change an external disturbance in the Raisim simulator, you must:
-
-- change function applyExternalForce() in raisim_unitree_ros_driver/src/raisim_unitree_ros_driver.cpp file.
-
-- change External Force Parameters in raisim_unitree_ros_driver/include/raisim_unitree_ros_driver file:
-  
 
 # Finite State Machine (FSM)
 You can exit from a gait state to the Passive state in two ways:
@@ -108,9 +99,19 @@ graph TD;
   MPC_Locomotion-->Balance_Stand;
 ```
 
+# External Disturbance
+To add or change an external disturbance in the Raisim simulator, you must:
+
+- change function applyExternalForce() in raisim_unitree_ros_driver/src/raisim_unitree_ros_driver.cpp file.
+
+- change External Force Parameters in raisim_unitree_ros_driver/include/raisim_unitree_ros_driver file:
+  
+
 # Control System Description
 
 Control system architecture:
 ![image info](./images/architecture.png) 
 
 # Adaptive MPC
+
+
