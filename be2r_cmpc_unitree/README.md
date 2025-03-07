@@ -294,5 +294,8 @@ A schematic representation of a single leg’s gait cycle:
 # CV walking
 To run with vision and an elevation map, you need the repository: [elevation_map](https://gitlab.com/rl-unitree-a1/elevation_map)
 
+# During the development, various open source repositories were used as a basis
+https://github.com/mit-biomimetics/Cheetah-Software
+
 # Article
 Artem A.Egorov, Maxim V. Lyahovski, Denis A. Sokolov, Alexey M.Burkov, Sergey A. Kolyubin. Design and performance evaluation of receding horizon controllers for quadrupedal robots: case study on stairs climbing and balancing.[HERE](doc/IFAC_WC_quadro__3_.pdf)

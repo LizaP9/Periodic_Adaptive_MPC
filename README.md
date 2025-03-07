@@ -1,37 +1,35 @@
 # Periodic_Adaptive_MPC
 
-[](url)## Dependencies
-Install Eigen3 from apt
+This repository contains an Adaptive Model Predictive Control (Adaptive MPC) approach designed specifically for quadrupedal robots operating under periodic disturbances.
+
+# Install
+
+First install raisim_ros_wrapper repository, which provides a ROS-based simulation environment using the RaiSim physics engine:
+
 ```
-sudo apt install libeigen3-dev
-```
-If you build it from source, delete it
-```
-cd <eigen_dir>/build
-sudo make uninstall
+cd <path_to_ws>/catkin_ws
+mkdir src
+cd src
+git clone https://gitlab.com/rl-unitree-a1/raisim_ros_wrapper.git
+catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
 ```
 
-Install apt dependencies
+Then, clone this repository to <path_to_ws>/src:
 ```
-rosdep install --from-paths src --ignore-src -r -y --skip-keys "raisim"
-# if not working
-sudo apt install ros-noetic-pcl-ros
-sudo apt install ros-noetic-grid-map
+git clone https://github.com/LizaP9/Periodic_Adaptive_MPC.git
 ```
 
-Build from source
+Build and source workspace (Use the --jobs 2 flag if your CPU resources are limited to help avoid build errors.):
 ```
-cd <workspace>/src
-git clone https://github.com/anybotics/kindr
-git clone https://github.com/anybotics/kindr_ros
-catkin build
+catkin build --jobs 2
+source devel/setup.bash
 ```
 
-## Usage
+# Usage
 
-# Raisim simulator
+## Raisim simulator
 
-Launch the visualizer. You can choose one of the following (opengl is easier for visualization):
+In first terminal launch the visualizer. You can choose one of the following (opengl is easier for visualization):
 ```
 # unity
 roslaunch raisim unity.launch
@@ -39,33 +37,25 @@ roslaunch raisim unity.launch
 roslaunch raisim opengl.launch
 ```
 
-Launch the Raisim server:
+In second terminal launch the Raisim server:
 ```
 roslaunch raisim_unitree_ros_driver spawn.launch scene:=2
 ```
 Arguments:
 - scene - - indicates which objects will be created in the simulator scene.
 
-Launch the controller for the simulator in a separate launch file:
-```
-roslaunch be2r_cmpc_unitree unitree_sim.launch
-```
-
-Launch the controller for the simulator with the universal launch file:
+In third terminal launch the controller for the simulator with the universal launch file:
 ```
 roslaunch be2r_cmpc_unitree unitree_a1.launch sim:=true rviz:=false rqt_reconfigure:=true
 ```
+
 Arguments:
 - sim - (bool) whether running in simulation or on a real robot;
 - rviz - (bool) whether to start RViz;
 - rqt_reconfigure - (bool) whether to start rqt.
 
-Launch rqt to control states and adjust robot parameters (optional):
-```
-rqt
-```
 
-# Real Unitree A1
+## Real Unitree A1
 Launch the controller to control the real robot (separate launch file):
 ```
 roslaunch be2r_cmpc_unitree unitree_real.launch
@@ -80,7 +70,7 @@ Arguments:
 - rviz - (bool) whether to start RViz;
 - rqt_reconfigure - (bool) whether to start rqt.
 
-# Finite State Machine (FSM)
+## Finite State Machine (FSM)
 You can exit from a gait state to the Passive state in two ways:
 1. From any state directly. The motors switch to damping mode, and the robot smoothly goes to the ground.
 2. Switch first to Balance_Stand, then Lay_Down, and finally Passive.
@@ -99,19 +89,95 @@ graph TD;
   MPC_Locomotion-->Balance_Stand;
 ```
 
-# External Disturbance
-To add or change an external disturbance in the Raisim simulator, you must:
-
-- change function applyExternalForce() in raisim_unitree_ros_driver/src/raisim_unitree_ros_driver.cpp file.
-
-- change External Force Parameters in raisim_unitree_ros_driver/include/raisim_unitree_ros_driver file:
-  
-
-# Control System Description
+## Control System Description
 
 Control system architecture:
-![image info](./images/architecture.png) 
+![image info](scheme.jpg) 
 
-# Adaptive MPC
+## Adaptive MPC
+
+### Mathematical Formulation
+
+The discrete-time dynamics of a quadrupedal robot under periodic disturbances are represented as:
+
+\begin{equation*}
+x_{k+1} = A_d x_k + B_d u_k + G_d + Q_d \xi_k,
+\end{equation*}
+
+where:
+
+\begin{equation*}
+A_d = \begin{bmatrix}
+1_{3\times3} & 0_{3\times3} & T(\theta)\Delta t & 0_{3\times3} \
+0_{3\times3} & 1_{3\times3} & 0_{3\times3} & 1_{3\times3}\Delta t \
+0_{3\times3} & 0_{3\times3} & 1_{3\times3} & 0_{3\times3} \
+0_{3\times3} & 0_{3\times3} & 0_{3\times3} & 1_{3\times3}
+\end{bmatrix},
+\end{equation*}
+
+\begin{equation*}
+B_d = \begin{bmatrix}
+0_{3\times3} & \dots & 0_{3\times3} \
+0_{3\times3} & \dots & 0_{3\times3} \
+I^{-1}[r_1]\times \Delta t & \dots & I^{-1}[r{n_c}]\times \Delta t \
+1{3\times3}\Delta t/m & \dots & 1_{3\times3}\Delta t/m
+\end{bmatrix},
+
+\begin{equation*}
+Q_d = \begin{bmatrix}
+0_{6\times6} \
+1_{6\times6}
+\end{bmatrix}, \quad
+G_d = [0 ; 0 ; 0 ; 0 ; 0 ; 0 ; 0 ; 0 ; 0 ; 0 ; 0 ; g]^T
+\end{equation*}
+
+where:
+
+ represents the orientation,
+
+ is the transformation matrix from Euler angles to angular velocities,
+
+ is the time step,
+
+ is the inertia matrix,
+
+ represents the cross-product matrix for vector ,
+
+ is the mass of the robot, and
+
+ is gravitational acceleration.
+
+### Disturbance Estimation
+
+The external periodic disturbances  are estimated through solving the quadratic optimization problem:
+
+\begin{equation*}
+\xi^* = (Q_d^T S Q_d)^{-1} Q_d^T S (x_{k+1}^{\text{real}} - A_d x_k^{real} - B_d u_k - G_d)
+\end{equation*}
+
+This lightweight regression-based estimator accurately separates stationary and periodic disturbance components, improving tracking performance.
 
 
+## External Disturbance
+To add or modify an external disturbance (force) in the Raisim simulation environment, follow these steps:
+
+1. Modify the Force Application Function
+
+Edit the applyExternalForce() function located in:
+
+[raisim_unitree_ros_driver.cpp](raisim_unitree_ros_driver/src/raisim_unitree_ros_driver.cpp)
+
+This function controls how external forces are applied to the simulated robot.
+
+2. Adjust External Force Parameters
+
+Update the external force parameters defined in:
+
+[raisim_unitree_ros_driver.hpp](raisim_unitree_ros_driver/include/raisim_unitree_ros_driver.hpp)
+
+Here, you can set the magnitude and frequency of the disturbances applied to the robot.
+  
+
+## Results
+
+Experimental simulations on a Unitree A1 quadrupedal platform demonstrate that Adaptive MPC with periodic disturbance estimation outperforms both baseline MPC and static disturbance compensation, achieving superior tracking accuracy across various disturbance scenarios.
