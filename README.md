@@ -127,6 +127,7 @@ B_d = \begin{bmatrix}
 I^{-1}[r_1]\times \Delta t & \dots & I^{-1}[r{n_c}]\times \Delta t \
 1{3\times3}\Delta t/m & \dots & 1_{3\times3}\Delta t/m
 \end{bmatrix},
+\end{equation*}
 ```
 
 ```math
@@ -141,27 +142,27 @@ G_d = [0 ; 0 ; 0 ; 0 ; 0 ; 0 ; 0 ; 0 ; 0 ; 0 ; 0 ; g]^T
 
 where:
 
- represents the orientation,
-
- is the transformation matrix from Euler angles to angular velocities,
-
- is the time step,
-
- is the inertia matrix,
-
- represents the cross-product matrix for vector ,
-
- is the mass of the robot, and
-
- is gravitational acceleration.
+```math
+\begin{itemize}
+    \item $\theta$: Orientation of the robot's base
+    \item $T(\theta)$: Transformation matrix from Euler angles to angular velocities
+    \item $\Delta t$: Discrete time step
+    \item $I$: Inertia matrix of the robot
+    \item $[r_i]_{\times}$: Cross-product matrix associated with vector $r_i$
+    \item $m$: Mass of the robot
+    \item $g$: Gravitational acceleration
+\end{itemize}
+```
 
 ### Disturbance Estimation
 
 The external periodic disturbances  are estimated through solving the quadratic optimization problem:
 
+```math
 \begin{equation*}
 \xi^* = (Q_d^T S Q_d)^{-1} Q_d^T S (x_{k+1}^{\text{real}} - A_d x_k^{real} - B_d u_k - G_d)
 \end{equation*}
+```
 
 This lightweight regression-based estimator accurately separates stationary and periodic disturbance components, improving tracking performance.
 
