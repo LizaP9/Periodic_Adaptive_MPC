@@ -100,12 +100,15 @@ Control system architecture:
 
 The discrete-time dynamics of a quadrupedal robot under periodic disturbances are represented as:
 
-\begin{equation*}
+```math
+\begin{equation*}  
 x_{k+1} = A_d x_k + B_d u_k + G_d + Q_d \xi_k,
 \end{equation*}
+```
 
 where:
 
+```math
 \begin{equation*}
 A_d = \begin{bmatrix}
 1_{3\times3} & 0_{3\times3} & T(\theta)\Delta t & 0_{3\times3} \
@@ -114,7 +117,9 @@ A_d = \begin{bmatrix}
 0_{3\times3} & 0_{3\times3} & 0_{3\times3} & 1_{3\times3}
 \end{bmatrix},
 \end{equation*}
+```
 
+```math
 \begin{equation*}
 B_d = \begin{bmatrix}
 0_{3\times3} & \dots & 0_{3\times3} \
@@ -122,7 +127,9 @@ B_d = \begin{bmatrix}
 I^{-1}[r_1]\times \Delta t & \dots & I^{-1}[r{n_c}]\times \Delta t \
 1{3\times3}\Delta t/m & \dots & 1_{3\times3}\Delta t/m
 \end{bmatrix},
+```
 
+```math
 \begin{equation*}
 Q_d = \begin{bmatrix}
 0_{6\times6} \
@@ -130,6 +137,7 @@ Q_d = \begin{bmatrix}
 \end{bmatrix}, \quad
 G_d = [0 ; 0 ; 0 ; 0 ; 0 ; 0 ; 0 ; 0 ; 0 ; 0 ; 0 ; g]^T
 \end{equation*}
+```
 
 where:
 
