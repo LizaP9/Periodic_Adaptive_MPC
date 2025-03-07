@@ -136,13 +136,12 @@ Q_d = \begin{bmatrix}
 0_{6\times6} \
 1_{6\times6}
 \end{bmatrix}, \quad
-G_d = [0 0 0 0 0 0 0 0 0 0 0 g]^T
+G_d = [0  0  0  0  0  0  0  0  0  0  0  g]^T
 \end{equation*}
 ```
 
 where:
 
-```math
 - $\theta$: Orientation of the robot's base  
 - $T(\theta)$: Transformation matrix from Euler angles to angular velocities  
 - $\Delta t$: Discrete time step  
@@ -150,7 +149,7 @@ where:
 - $[r_i]_{\times}$: Cross-product matrix associated with vector $r_i$  
 - $m$: Mass of the robot  
 - $g$: Gravitational acceleration  
-```
+
 
 ### Disturbance Estimation
 
