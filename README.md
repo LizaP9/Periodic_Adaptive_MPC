@@ -125,7 +125,7 @@ B_d = \begin{bmatrix}
 0_{3\times3} & \dots & 0_{3\times3} \
 0_{3\times3} & \dots & 0_{3\times3} \
 I^{-1}[r_1]\times \Delta t & \dots & I^{-1}[r{n_c}]\times \Delta t \
-1{3\times3}\Delta t/m & \dots & 1_{3\times3}\Delta t/m
+1_{3\times3}\Delta t/m & \dots & 1_{3\times3}\Delta t/m
 \end{bmatrix},
 \end{equation*}
 ```
@@ -136,7 +136,7 @@ Q_d = \begin{bmatrix}
 0_{6\times6} \
 1_{6\times6}
 \end{bmatrix}, \quad
-G_d = [0  0  0  0  0  0  0  0  0  0  0  g]^T
+G_d = [0 ; 0 ; 0 ; 0 ; 0 ; 0 ; 0 ; 0 ; 0 ; 0 ; 0 ; g]^T
 \end{equation*}
 ```
 
@@ -157,11 +157,16 @@ The external periodic disturbances  are estimated through solving the quadratic 
 
 ```math
 \begin{equation*}
-\xi^* = (Q_d^T S Q_d)^{-1} Q_d^T S (x_{k+1}^{\text{real}} - A_d x_k^{real} - B_d u_k - G_d)
+\min_{\xi} \left\| x_{k+1}^{\text{real}} - A_d x_k^{\text{real}} - B_d u_k - Q_d \xi - G_d \right\|_S^2
 \end{equation*}
 ```
+where:
 
-This lightweight regression-based estimator accurately separates stationary and periodic disturbance components, improving tracking performance.
+- $\ x_{k}^{\text{real}}, x_{k+1}^{\text{real}} $: Real observed system states at steps \(k\) and \(k+1\)  
+- $\ A_d, B_d, Q_d, G_d \$: Discrete-time system matrices  
+- $\ u_k \$: Control inputs (ground reaction forces)  
+- $\ \xi \$: Vector of unknown external disturbances to estimate  
+- $\ S \in \mathbb{R}^{6\times6} $: Weighting matrix penalizing the estimation errors
 
 
 ## External Disturbance
