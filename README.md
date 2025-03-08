@@ -2,7 +2,7 @@
 
 This repository contains an Adaptive Model Predictive Control (Adaptive MPC) approach designed specifically for quadrupedal robots operating under periodic disturbances.
 
-![Periodic Adaptive MPC](https://github.com/LizaP9/Periodic_Adaptive_MPC/blob/main/periodic.gif)
+![Periodic Adaptive MPC](https://github.com/LizaP9/Periodic_Adaptive_MPC/blob/main/period.gif)
 
 # Install
 
